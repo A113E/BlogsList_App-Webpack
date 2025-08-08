@@ -39,10 +39,7 @@ let blogs = [
     likes: 10,
   }
 ]
-// Ruta para obtener la página principal
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
+
 // Ruta para obtener la lista de blogs
 app.get('/api/blogs', (request, response) => {
   response.json(blogs)
