@@ -5,6 +5,5 @@ Content-Type: application/json
     "titulo": "Probando POSTMAN",
     "autor": "Juan Miercoles",
     "url": "https://miblog.com",
-    "likes": "20",
-    "important": true
+    "likes": 20
 }

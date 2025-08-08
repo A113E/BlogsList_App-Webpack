@@ -1,6 +1,9 @@
+require('dotenv').config() // Libreria para variable de entorno
 const express = require('express')
 const app = express() 
 const cors = require('cors')
+
+const Blog = require('./models/blog') // Model
 
 // Middlewares
 // Middleware que imprime información de cada solicitud que se envía al servidore
@@ -11,91 +14,87 @@ const solicitudesInfo = (request, response, next) => {
     next() // Pasa al siguiente middleware
 }
 
-app.use(express.json()) // json-parser para añadir blogs (POST)
-app.use(solicitudesInfo) // Usar el middleware solicitudInfo
 app.use(cors()) // Usar el middleware para permitir solicitudes de todos los origenes
 app.use(express.static('build')) // Middleware para que muestre contenido estático
+app.use(express.json()) // json-parser para añadir blogs (POST)
+app.use(solicitudesInfo) // Usar el middleware solicitudInfo
 
-let blogs = [
-  {
-    id: 1,
-    titulo: "HTML is easy",
-    autor: "Daniel Palomares",
-    url: "https://miblog.com",
-    likes: 20,
-  },
-  {
-    id: 2,
-    titulo: "Browser can execute only JavaScript",
-    autor: "Roberto Alcantars",
-    url: "https://miblog.com",
-    likes: 40,
-  },
-  {
-    id: 3,
-    titulo: "GET and POST are the most important methods of HTTP protocol",
-    autor: "Manuel Pezuño",
-    url: "https://miblog.com",
-    likes: 10,
-  }
-]
 
+// Ruta para la página principal
+app.get('/', (request, response) => {
+  response.send('<h1>Lista de Blogs</h1>')
+})
 // Ruta para obtener la lista de blogs
-app.get('/api/blogs', (request, response) => {
-  response.json(blogs)
+app.get('/api/blogs', (request, response, next) => {
+  // Obtiene los blogs desde la base de datos MongoDB
+  Blog.find({}).then(blogs => {
+    response.json(blogs)
+  })
+  // Manejo de errores
+  .catch((error) => next(error))
 })
 // Ruta para obtener un blog individual
-app.get('/api/blogs/:id', (request, response) => {
-  const id = Number(request.params.id) // Solicitud request para obtener el parámetro id
-  const blog = blogs.find(blog => blog.id === id) // Buscamos el id del blog en especifico dentro del array)
-  console.log(blog)
-  // Condición si encuentra o no el blog
-  if (blog) {
-    response.json(blog) // Si encuentra el id del blog
-  } else {
-    response.status(404).end() // Si no lo encuentra responde con la solicitud 404 No Found
-  }
+app.get('/api/blogs/:id', (request, response, next) => {
+  const id = request.params.id // Solicitud request para obtener el parámetro id
+  Blog.findById(id)
+  .then(blog => {
+    // Si encuentra el blog
+    if (blog) {
+      response.json(blog)
+    } else { // Si no lo encuentra
+      response.status(404).end() // No found
+    }
+  })
+  // Manejo de errores
+  .catch((error) => next(error))
 })
 // Ruta para eliminar un blog
-app.delete('/api/blogs/:id', (request, response) => {
-   const id = Number(request.params.id) // Solicitud request para obtener el parámetro id
-   blogs = blogs.filter(blog => blog.id !== id) // El blog eliminado no se encuentra en el array
-   // Si el blog se eliminó
-   response.status(204).end() // Responde con 204 No content
+app.delete('/api/blogs/:id', (request, response, next) => {
+   const id = request.params.id // Solicitud request para obtener el parámetro id
+   Blog.findByIdAndDelete(id)
+   .then(() => {
+    response.status(204).end() // Responde con "No content"
+   })
+   // Manejo de errores
+   .catch((error) => next(error))
 })
-// Función para generar un ID consecutivo
-const generarId = () => {
-    const maxId = blogs.length > 0 // Encuentra el id mayor
-    ? Math.max(...blogs.map(b => b.id))  // Crea un nuevo array con todos los ids de los blogs
-    : 0 // Si hay numeros empieza desde 0
-    return maxId + 1 // Regresa el número de ID mayor y le suma 1
-}
 // Ruta para postear un blog
-app.post('/api/blogs', (request, response) => {
+app.post('/api/blogs', (request, response, next) => {
     const body = request.body // Acceder a los datos de la propiedad body
-    // Reglas si faltan datos en el post
-    if (
-    !body.titulo?.trim() ||
-    !body.autor?.trim() ||
-    !body.url?.trim() 
-    ) {
-    return response.status(400).json({ // Responde con Bad Requests
-    error: 'Complete todos los datos necesarios',
-    })
-    }
-    
-    // Reglas para definir los tipos de datos creados
-    nuevoBlog = {
-        id: generarId(),
+   
+    // Crear un nuevo blog
+    const nuevoBlog = new Blog({
         titulo: body.titulo,
         autor: body.autor,
         url: body.url,
-        likes: 0
-    }
-    blogs = blogs.concat(nuevoBlog) // Aggrega el nuevo blog a la array
+        likes: body.likes || 0,
+    })
+    
+   nuevoBlog.save()
+   .then(blogGuardado => {
+    response.status(201).json(blogGuardado)
+    console.log(blogGuardado)  
+   })
+   // Manejo de errores
+   .catch((error) => next(error))
+})
+// Ruta para dar like a un blog
+app.post('/api/blogs/:id/likes', (request, response, next) => {
+  const id = request.params.id // Solicitud request para obtener el parámetro id
+  Blog.findById(id)
+  .then(blog => {
+      if (!blog) {
+        return response.status(404).json({ error: 'Blog no encontrado' })
+      }
+  blog.likes += 1
 
-    console.log(nuevoBlog)
-    response.json(nuevoBlog) // Responde con el blog creado    
+  return blog.save()
+    })
+    .then(blogActualizado => {
+      response.status(200).json(blogActualizado)
+    })
+  // Manejo de errores
+   .catch((error) => next(error))
 })
 // Miiddleware para capturar solicitudes a rutas inexistentes
 const rutasInexistentes = (request, response) => {
@@ -104,8 +103,24 @@ const rutasInexistentes = (request, response) => {
 }
 app.use(rutasInexistentes) // Usar el middleware rutasInexistentes
 
+// Middleware para manejo de errores
+const manejoErrores = (error, request, response, next) => {
+  console.error(error.message)
+
+  // Verificación de tipo de error:
+  if (error.name === 'CastError') { // Si es una excepción CastError: mal formarto de ID
+    return response.status(400).send({ error: 'Formato de ID incorrecto' })
+  } else if (error.name === 'ValidationError') { // Si es un error en la validación de datos de los campos
+    return response.status(300).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(manejoErrores) // Usar el handler middleware ** DEBE SER EL ÚLTIMO MIDDLEWARE CARGADO **
+
 // Puerto donde se desplegará la app
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
