@@ -5,6 +5,8 @@ const cors = require('cors')
 
 const Blog = require('./models/blog') // Model
 
+app.use(express.static('build')) // Middleware para que muestre contenido estático
+
 // Middlewares
 // Middleware que imprime información de cada solicitud que se envía al servidore
 const solicitudesInfo = (request, response, next) => {
@@ -15,7 +17,6 @@ const solicitudesInfo = (request, response, next) => {
 }
 
 app.use(cors()) // Usar el middleware para permitir solicitudes de todos los origenes
-app.use(express.static('build')) // Middleware para que muestre contenido estático
 app.use(express.json()) // json-parser para añadir blogs (POST)
 app.use(solicitudesInfo) // Usar el middleware solicitudInfo
 
