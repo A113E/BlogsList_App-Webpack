@@ -20,10 +20,7 @@ app.use(express.json()) // json-parser para añadir blogs (POST)
 app.use(solicitudesInfo) // Usar el middleware solicitudInfo
 
 
-// Ruta para la página principal
-app.get('/', (request, response) => {
-  response.send('<h1>Lista de Blogs</h1>')
-})
+
 // Ruta para obtener la lista de blogs
 app.get('/api/blogs', (request, response, next) => {
   // Obtiene los blogs desde la base de datos MongoDB
