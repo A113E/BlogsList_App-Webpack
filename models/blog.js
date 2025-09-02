@@ -1,21 +1,5 @@
 const mongoose = require('mongoose') // Modulo para conectar con MongoDB
 
-mongoose.set('strictQuery', false) // Evita advertencias en consultas estrictas
-
-// Url del entorno
-const url = process.env.MONGODB_URI
-console.log('Conectado', url)
-
-// Conectar a la base de datos
-mongoose.connect(url)
-.then(resultado => {
-    console.log('Conectado a MongoDB')
-})
-// Manejo de errores
-.catch(error => {
-    console.log('Error al conectar a MongoDB', error.message)
-})
-
 // Esquema BD para la lista de blogs
 const blogSchema = new mongoose.Schema({
     titulo: {
