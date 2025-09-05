@@ -2,46 +2,37 @@ const blogsRouter = require('express').Router() // Enrutador
 const Blog = require('../models/blog') // Modelo
 
 // Ruta para obtener la lista de blogs
-blogsRouter.get('/', (request, response, next) => {
-  // Obtiene los blogs desde la base de datos MongoDB
-  Blog.find({}).then(blogs => {
+blogsRouter.get('/', async (request, response) => {
+    // Obtiene los blogs desde la base de datos MongoDB
+    const blogs = await Blog.find({})
     response.json(blogs)
-  })
-  // Manejo de errores
-  .catch((error) => next(error))
 })
 
 // Ruta para obtener un blog individual
-blogsRouter.get('/:id', (request, response, next) => {
-  const id = request.params.id // Solicitud request para obtener el parámetro id
-  Blog.findById(id)
-  .then(blog => {
-    // Si encuentra el blog
+blogsRouter.get('/:id', async (request, response) => {
+    // Busca el blog por ID
+    const blog = await Blog.findById(request.params.id)
+
     if (blog) {
-      response.json(blog)
-    } else { // Si no lo encuentra
-      response.status(404).end() // No found
+      response.json(blog.toJSON())
+    } else {
+      response.status(404).end()
     }
-  })
-  // Manejo de errores
-  .catch((error) => next(error))
 })
 
 // Ruta para eliminar un blog
-blogsRouter.delete('/:id', (request, response, next) => {
-   const id = request.params.id // Solicitud request para obtener el parámetro id
-   Blog.findByIdAndDelete(id)
-   .then(() => {
-    response.status(204).end() // Responde con "No content"
-   })
-   // Manejo de errores
-   .catch((error) => next(error))
+blogsRouter.delete('/:id', async (request, response) => {
+   const blog = await Blog.findByIdAndDelete(request.params.id) // Solicitud request para obtener el parámetro id y eliminar
+   if (!blog) {
+    return response.status(404).json({ error: 'Blog no encontrado' })
+   }
+   response.status(204).end()
 })
 
 // Ruta para postear un blog
-blogsRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', async (request, response) => {
     const body = request.body // Acceder a los datos de la propiedad body
-   
+
     // Crear un nuevo blog
     const nuevoBlog = new Blog({
         titulo: body.titulo,
@@ -49,33 +40,23 @@ blogsRouter.post('/', (request, response, next) => {
         url: body.url,
         likes: body.likes || 0,
     })
-    
-   nuevoBlog.save()
-   .then(blogGuardado => {
-    response.status(201).json(blogGuardado)
-    console.log(blogGuardado)  
-   })
-   // Manejo de errores
-   .catch((error) => next(error))
+
+   const blogGuardado = await nuevoBlog.save()
+   response.status(201).json(blogGuardado)
 })
 
 // Ruta para dar like a un blog
-blogsRouter.post('/:id/likes', (request, response, next) => {
-  const id = request.params.id // Solicitud request para obtener el parámetro id
-  Blog.findById(id)
-  .then(blog => {
-      if (!blog) {
-        return response.status(404).json({ error: 'Blog no encontrado' })
-      }
-  blog.likes += 1
+blogsRouter.post('/:id/likes', async (request, response) => {
+  const blogLike = await Blog.findByIdAndUpdate(
+      request.params.id,
+      { $inc: { likes: 1 } },  // incrementa likes en +1
+      { new: true }           // devuelve el blog actualizado
+    )
+  if (!blogLike) {
+    return response.status(404).json({ error: 'Blog no encontrado' })
+   }
 
-  return blog.save()
-    })
-    .then(blogActualizado => {
-      response.status(200).json(blogActualizado)
-    })
-  // Manejo de errores
-   .catch((error) => next(error))
+  response.status(200).json(blogLike)
 })
 
 module.exports = blogsRouter

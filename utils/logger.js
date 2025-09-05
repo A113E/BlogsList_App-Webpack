@@ -1,9 +1,13 @@
 const info = (...params) => {
-    console.log(...params) // Imprimir mensajes de registros normales
+    if (process.env.NODE_ENV !== 'test') {
+    console.log(...params) // Imprime mensajes de registro normales
+  }
 }
 
 const error = (...params) => {
-    console.error(...params) // Imprimir mensajes de error
+    if (process.env.NODE_ENV !== 'test') {
+    console.error(...params) // Imprime mensajes de error
+  }
 }
 
 module.exports = {

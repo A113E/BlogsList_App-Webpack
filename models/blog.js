@@ -10,14 +10,17 @@ const blogSchema = new mongoose.Schema({
     autor: {
        type: String,
         minLength: 5, // Minimo 5 caracteres
-        required: true // Campo requerido 
+        required: true // Campo requerido
     },
     url: {
         type: String,
         minLength: 5, // Minimo 5 caracteres
         required: true // Campo requerido
     },
-    likes: Number
+    likes: {
+        type: Number,
+        default: 0
+    }
 })
 
 // Configuración de los blogs a formato JSON
@@ -26,7 +29,7 @@ blogSchema.set('toJSON', {
         returnedObject.id = returnedObject._id.toString() // Crea un campo id y lo convierte en una cadena
         // Elimina el campo "_id" original
         delete returnedObject._id
-       // Elimina el campo "__v" 
+       // Elimina el campo "__v"
        delete returnedObject.__v
     }
 })

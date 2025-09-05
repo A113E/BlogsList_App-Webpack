@@ -7,8 +7,8 @@ if (process.argv.length < 3) {
 
 const contraseña = process.argv[2]
 
-const url = 
-  `mongodb+srv://admin:${contraseña}@cluster0.lm4im.mongodb.net/BlogLista?retryWrites=true&w=majority&appName=Cluster0`   
+const url =
+  `mongodb+srv://admin:${contraseña}@cluster0.lm4im.mongodb.net/BlogListaTest?retryWrites=true&w=majority&appName=Cluster0`
 
 mongoose.set('strictQuery', false)
 
@@ -23,14 +23,27 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const blog = new Blog({
+const blogs = [
+  {
     titulo: 'Probando base de datos',
     autor: 'Admin',
     url: 'www.admin.local',
     likes: 0
-})
+  },
+  {
+    titulo: 'Segundo blog de prueba',
+    autor: 'Otro Autor',
+    url: 'www.otroblog.local',
+    likes: 5
+  }
+]
 
-blog.save().then(result => {
-    console.log('Blog guardado')
+Blog.insertMany(blogs)
+  .then(() => {
+    console.log('Blogs guardados')
     mongoose.connection.close()
-})
+  })
+  .catch(error => {
+    console.error(error)
+    mongoose.connection.close()
+  })

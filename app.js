@@ -4,7 +4,7 @@ const app = express()
 const cors = require('cors')
 const blogsRouter = require('./controllers/blogs') // Controlador de rutas
 const middleware = require('./utils/middleware') // Modulo que maneja los middlewares
-const logger = require('./utils/logger') // Modulo que maneja la impresión de mensajes 
+const logger = require('./utils/logger') // Modulo que maneja la impresión de mensajes
 const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)

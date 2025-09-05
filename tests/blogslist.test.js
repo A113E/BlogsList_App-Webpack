@@ -1,7 +1,7 @@
 // Pruebas para la lista de blogs
 const { test, describe } = require('node:test')
 const assert = require('node:assert') // Para comparar resultados
-const ayudaPruebas = require('../utils/ayuda_pruebas') 
+const ayudaPruebas = require('../utils/ayuda_lista')
 
 // Prueba que comprueba que el array devuelva el valor 1
 test('Función dummy devuelve el valor 1', () => {
@@ -73,7 +73,7 @@ describe('Total de Likes', () => {
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0
-  }  
+  }
   ]
 
   // Prueba que comprueba el total de likes de la lista de un solo blog
@@ -157,7 +157,7 @@ describe('Blog Favorito', () => {
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0
-  }  
+  }
   ]
 
   // Prueba que comprueba que si el array está vacio devuelve null
@@ -255,7 +255,7 @@ describe('Autor con más blogs', () => {
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0
-  }  
+  }
   ]
 
     // Prueba que comprueba que devuelva null si la lista esta vacia
@@ -351,7 +351,7 @@ describe('Autor con más Likes', () => {
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0
-  }  
+  }
   ]
 
   // Prueba que comprueba que devuelva null si la lista esta vacia
