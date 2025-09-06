@@ -1,9 +1,10 @@
-POST http://localhost:3001/api/blogs/
+POST http://localhost:3003/api/blogs/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmVfdXN1YXJpbyI6ImFsYmUiLCJpZCI6IjY4YmI3OWExM2I0YmI0YzJlMzBjOTg4OCIsImlhdCI6MTc1NzE4MjMzNiwiZXhwIjoxNzU3MTg1OTM2fQ.-M9V0eDf8I1w2I-jhspwxZuboNi92LsBDI-ft7ed03c
 
 {
-    "titulo": "Probando POSTMAN",
-    "autor": "Juan Miercoles",
+    "titulo": "Probando la creacion de blogs con autorizacion",
+    "autor": "Alberto",
     "url": "https://miblog.com",
     "likes": 20
 }

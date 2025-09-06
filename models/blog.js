@@ -20,6 +20,10 @@ const blogSchema = new mongoose.Schema({
     likes: {
         type: Number,
         default: 0
+    },
+    usuario: { // Matriz ID que hace referncia a los usuarios
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario'
     }
 })
 

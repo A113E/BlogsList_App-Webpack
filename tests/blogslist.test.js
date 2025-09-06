@@ -3,14 +3,6 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert') // Para comparar resultados
 const ayudaPruebas = require('../utils/ayuda_lista')
 
-// Prueba que comprueba que el array devuelva el valor 1
-test('Función dummy devuelve el valor 1', () => {
-    const blogs = [] // Array vacio
-
-    const resultado = ayudaPruebas.dummy(blogs)
-    assert.strictEqual(resultado, 1) // Comprueba que el resultado sea 1
-})
-
 // Bloque de pruebas para el total de likes
 describe('Total de Likes', () => {
     // Array inicial con un solo blog

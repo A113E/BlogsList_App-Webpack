@@ -1,11 +1,6 @@
 // Modulo para definir funciones de apoyo para las pruebas
 const _ = require('lodash') // Libreria para conteos y maximos
 
-// Funcion que toma un array (blogs) y siempre devuelve el valor 1
-const dummy = (blogs) => {
-    return 1
-}
-
 // Función que toma un array (blogs) y devuelve la suma total de likes en todos los blogs
 const totalLikes = (blogs) => {
     return blogs.reduce((sum, blog) => sum + blog.likes, 0) // El valor inicial del acumulador(sum) es 0, sumando cada like del blog al acumulador (sum)
@@ -58,7 +53,6 @@ const masLikes = (blogs) => {
 }
 
 module.exports = {
-    dummy,
     totalLikes,
     blogFavorito,
     masBlogs,
