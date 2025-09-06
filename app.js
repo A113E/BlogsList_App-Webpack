@@ -30,7 +30,7 @@ app.use(middleware.solicitudesInfo)
 app.use(middleware.tokenExtractor)
 
 // Enrutadores
-app.use('/api/blogs', middleware.usuarioExtractor, blogsRouter)
+app.use('/api/blogs', blogsRouter)
 app.use('/api/usuarios', usuariosRouter)
 app.use('/api/login', loginRouter)
 
