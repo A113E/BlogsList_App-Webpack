@@ -41,9 +41,13 @@ blogsRouter.delete('/:id', usuarioExtractor, async (request, response) => {
 })
 
 // Ruta para postear un blog
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', usuarioExtractor, async (request, response) => {
     const body = request.body // Acceder a los datos de la propiedad body
     const usuario = request.usuario // Acceder a traves del middleware
+
+    if (!usuario) {
+      return response.status(401).json({ error: 'Usuario no autenticado' })
+    }
 
     // Crear un nuevo blog
     const nuevoBlog = new Blog({
@@ -51,7 +55,7 @@ blogsRouter.post('/', async (request, response) => {
         autor: body.autor,
         url: body.url,
         likes: body.likes || 0,
-        usuario: usuario.id
+        usuario: usuario._id
     })
 
    const blogGuardado = await nuevoBlog.save()

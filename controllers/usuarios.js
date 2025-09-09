@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt') // Para encriptar contraseñas
 const usuariosRouter = require('express').Router() // Enrutador
 const Usuario = require('../models/usuario') // Modelo
+const { request } = require('../app')
 
 // Ruta para obtener todos los usuarios
 usuariosRouter.get('/', async (request, response) => {
@@ -59,6 +60,17 @@ usuariosRouter.post('/', async (request, response) => {
 
     const usuarioGuardado = await usuario.save()
     response.status(201).json(usuarioGuardado)
+})
+
+// Ruta para eliminar un usuario
+usuariosRouter.delete('/:id', async (request, response) => {
+    const usuario = await Usuario.findByIdAndDelete(request.params.id)
+
+    if (!usuario) {
+        return response.status(404).json({ error: 'Usuario no encontrado' })
+    }
+
+    response.status(204).end()
 })
 
 module.exports = usuariosRouter
