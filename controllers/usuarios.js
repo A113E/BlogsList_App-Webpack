@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt') // Para encriptar contraseñas
 const usuariosRouter = require('express').Router() // Enrutador
 const Usuario = require('../models/usuario') // Modelo
-const { request } = require('../app')
 
 // Ruta para obtener todos los usuarios
 usuariosRouter.get('/', async (request, response) => {
