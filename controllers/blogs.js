@@ -13,8 +13,9 @@ blogsRouter.get('/', async (request, response) => {
 
 // Ruta para obtener un blog individual
 blogsRouter.get('/:id', async (request, response) => {
+  const id = request.params.id
     // Busca el blog por ID
-    const blog = await Blog.findById(request.params.id)
+    const blog = await Blog.findById(id)
 
     if (blog) {
       response.json(blog.toJSON())
@@ -26,7 +27,8 @@ blogsRouter.get('/:id', async (request, response) => {
 // Ruta para eliminar un blog
 blogsRouter.delete('/:id', usuarioExtractor, async (request, response) => {
   const usuario = request.usuario
-   const blog = await Blog.findByIdAndDelete(request.params.id) // Solicitud request para obtener el parámetro id y eliminar
+  const id = request.params.id
+   const blog = await Blog.findByIdAndDelete(id).populate('usuario', { nombre_usuario: 1, nombre: 1 }) // Solicitud request para obtener el parámetro id y eliminar
    if (!blog) {
     return response.status(404).json({ error: 'Blog no encontrado' })
    }
@@ -65,12 +67,42 @@ blogsRouter.post('/', usuarioExtractor, async (request, response) => {
    response.status(201).json(blogGuardado)
 })
 
+// Ruta para actualizar un blog
+blogsRouter.put('/:id', usuarioExtractor, async (request, response) => {
+  const { titulo, autor, url, likes } = request.body
+  const id = request.params.id
+  const usuario = request.usuario
+
+  if (!usuario) {
+      return response.status(401).json({ error: 'Usuario no autenticado' })
+    }
+
+  // Verificar si ya existe otro blog con el mismo título
+  const blogExistente = await Blog.findOne({ titulo })
+  if (blogExistente && blogExistente._id.toString() !== id) {
+    return response.status(400).json({ error: 'Ya existe un blog con ese título' })
+  }
+
+
+  const blogActualizado = await Blog.findByIdAndUpdate(
+    id,
+    { titulo, autor, url, likes },
+    { new: true, runValidators: true, context: 'query' }
+  ).populate('usuario', { nombre_usuario: 1, nombre: 1 })
+
+  blogActualizado
+  ? response.status(200).json(blogActualizado.toJSON())
+  : response.status(404).end()
+})
+
 // Ruta para dar like a un blog
 blogsRouter.post('/:id/likes', async (request, response) => {
+  const id = request.params.id
+
   const blogLike = await Blog.findByIdAndUpdate(
-      request.params.id,
+      id,
       { $inc: { likes: 1 } },  // incrementa likes en +1
-      { new: true }           // devuelve el blog actualizado
+      { new: true, runValidators: true, context: 'query' } // devuelve el blog actualizado
     )
   if (!blogLike) {
     return response.status(404).json({ error: 'Blog no encontrado' })
